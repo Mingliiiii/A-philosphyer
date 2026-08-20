@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>texttextstext · 排版设计器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: #f5f5f0;
+            color: #1a1a1a;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+        .sidebar {
+            width: 300px;
+            background: #fff;
+            border-right: 1px solid #e8e8e8;
+            padding: 24px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .brand { font-size: 18px; font-weight: 500; letter-spacing: 2px; margin-bottom: 4px; }
+        .brand-sub { font-size: 11px; color: #999; margin-bottom: 20px; }
+        .back-link {
+            font-size: 12px;
+            color: #999;
+            text-decoration: none;
+            margin-bottom: 28px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .back-link:hover { color: #555; }
+        .section { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0; }
+        .section:last-child { border-bottom: none; }
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        label { display: block; font-size: 12px; color: #555; margin-bottom: 6px; }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            background: #fafafa;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, textarea:focus, select:focus { border-color: #1a1a1a; }
+        textarea { min-height: 70px; resize: vertical; line-height: 1.5; }
+        .color-row { display: flex; gap: 12px; }
+        .color-item { flex: 1; }
+        input[type="color"] { width: 100%; height: 38px; border: 1px solid #e0e0e0; border-radius: 8px; cursor: pointer; background: none; }
+        .slider-row { margin-bottom: 12px; }
+        .slider-label { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-bottom: 4px; }
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            cursor: pointer;
+        }
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .product-btn {
+            padding: 10px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            text-align: center;
+            font-size: 12px;
+            transition: all 0.2s;
+            color: #666;
+        }
+        .product-btn:hover { border-color: #bbb; }
+        .product-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.85; }
+        .btn-secondary {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            color: #1a1a1a;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .hint { font-size: 10px; color: #bbb; margin-top: 6px; line-height: 1.5; }
+        .preview-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: #e8e8e0;
+            position: relative;
+        }
+        #canvas {
+            background: #fff;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        .preview-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #aaa;
+            background: rgba(255,255,255,0.8);
+            padding: 6px 16px;
+            border-radius: 20px;
+        }
+        @media (max-width: 900px) {
+            .sidebar { width: 260px; padding: 20px; }
+            .preview-area { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="brand">texttextstext</div>
+        <div class="brand-sub">排版设计器</div>
+        <a href="index.html" class="back-link">← 返回首页</a>
+
+        <div class="section">
+            <div class="section-title">文本内容</div>
+            <label>主文字</label>
+            <textarea id="mainText" placeholder="输入你想印刻的文字...">黑暗並不意味著沒有光，&#10;而是光還沒有被看見。</textarea>
+            <label style="margin-top:10px">出處 / 署名</label>
+            <input type="text" id="sourceText" value="— Sirius 為你寫的" placeholder="例如：— 尼采">
+        </div>
+
+        <div class="section">
+            <div class="section-title">字體風格</div>
+            <select id="fontFamily">
+                <option value="classic">經典宋體 · 莊重</option>
+                <option value="modern">現代黑體 · 簡潔</option>
+                <option value="hand">手寫風 · 溫暖</option>
+                <option value="mono">活版印刷 · 復古</option>
+                <option value="english">英文襯線 · 優雅</option>
+            </select>
+        </div>
+
+        <div class="section">
+            <div class="section-title">顏色</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <label>文字色</label>
+                    <input type="color" id="textColor" value="#1a1a1a">
+                </div>
+                <div class="color-item">
+                    <label>背景色</label>
+                    <input type="color" id="bgColor" value="#f5f5f0">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">載體選擇</div>
+            <div class="product-grid">
+                <div class="product-btn active" data-product="scarf" onclick="selectProduct('scarf')">方巾</div>
+                <div class="product-btn" data-product="tshirt" onclick="selectProduct('tshirt')">短袖</div>
+                <div class="product-btn" data-product="cup" onclick="selectProduct('cup')">陶瓷杯</div>
+                <div class="product-btn" data-product="sock" onclick="selectProduct('sock')">襪子</div>
+                <div class="product-btn" data-product="poster" onclick="selectProduct('poster')">海報</div>
+                <div class="product-btn" data-product="tote" onclick="selectProduct('tote')">帆布袋</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">排版調整</div>
+            <div class="slider-row">
+                <div class="slider-label"><span>水平位置</span><span id="posXVal">0</span></div>
+                <input type="range" id="posX" min="-100" max="100" value="0">
+            </div>
+            <div class="slider-row">
+                <div class="slider-label"><span>垂直位置</span><span id="posYVal">0</span></div>
+                <input type="range" id="posY" min="-100" max="100" value="0">
+            </div>
+            <div class="slider-row">
+                <div class="slider-label"><span>字號大小</span><span id="fontSizeVal">48</span></div>
+                <input type="range" id="fontSize" min="20" max="100" value="48">
+            </div>
+            <button class="btn-secondary" onclick="centerText()">一鍵居中</button>
+        </div>
+
+        <div class="section">
+            <button class="btn-primary" onclick="downloadPNG()">下載 PNG 預覽圖</button>
+            <p class="hint">圖片將保存到瀏覽器下載文件夾<br>可直接發給工廠打樣</p>
+        </div>
+    </div>
+
+    <div class="preview-area">
+        <canvas id="canvas" width="600" height="600"></canvas>
+        <div class="preview-hint">實際印刷效果可能因載體材質略有差異</div>
+    </div>
+
+    <script>
+        // 字體映射
+        const fontMap = {
+            classic: '"Noto Serif SC", "Source Han Serif SC", "SimSun", "STSong", "serif"',
+            modern: '"Noto Sans SC", "Source Han Sans SC", "SimHei", "STHeiti", "sans-serif"',
+            hand: '"LXGW WenKai", "KaiTi", "STKaiti", "cursive"',
+            mono: '"Courier New", "SimSun", "monospace"',
+            english: '"Georgia", "Times New Roman", "serif"'
+        };
+
+        // 狀態
+        let state = {
+            text: document.getElementById('mainText').value,
+            source: document.getElementById('sourceText').value,
+            font: 'classic',
+            textColor: '#1a1a1a',
+            bgColor: '#f5f5f0',
+            product: 'scarf',
+            posX: 0,
+            posY: 0,
+            fontSize: 48
+        };
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // 從 URL 讀取參數（從 Sirius 跳轉過來）
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const text = params.get('text');
+            const source = params.get('source');
+            if (text) {
+                document.getElementById('mainText').value = text;
+                state.text = text;
+            }
+            if (source) {
+                document.getElementById('sourceText').value = '— ' + source;
+                state.source = '— ' + source;
+            }
+            draw();
+        }
+
+        // 監聽所有控件
+        ['mainText', 'sourceText', 'fontFamily', 'textColor', 'bgColor', 'posX', 'posY', 'fontSize'].forEach(id => {
+            document.getElementById(id).addEventListener('input', (e) => {
+                const key = id === 'fontFamily' ? 'font' : id === 'mainText' ? 'text' : id === 'sourceText' ? 'source' : id;
+                state[key] = e.target.value;
+                if (id === 'posX') document.getElementById('posXVal').textContent = e.target.value;
+                if (id === 'posY') document.getElementById('posYVal').textContent = e.target.value;
+                if (id === 'fontSize') document.getElementById('fontSizeVal').textContent = e.target.value;
+                draw();
+            });
+        });
+
+        function selectProduct(product) {
+            state.product = product;
+            document.querySelectorAll('.product-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.product === product);
+            });
+            const sizes = {
+                scarf: [600, 600],
+                tshirt: [600, 720],
+                cup: [520, 640],
+                sock: [420, 720],
+                poster: [520, 720],
+                tote: [640, 720]
+            };
+            const [w, h] = sizes[product];
+            canvas.width = w;
+            canvas.height = h;
+            draw();
+        }
+
+        function centerText() {
+            state.posX = 0;
+            state.posY = 0;
+            document.getElementById('posX').value = 0;
+            document.getElementById('posY').value = 0;
+            document.getElementById('posXVal').textContent = '0';
+            document.getElementById('posYVal').textContent = '0';
+            draw();
+        }
+
+        function drawProduct() {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.fillStyle = state.bgColor;
+            ctx.fillRect(0, 0, w, h);
+
+            switch (state.product) {
+                case 'scarf':
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(0,0,0,0.08)';
+                    ctx.shadowBlur = 24;
+                    ctx.shadowOffsetY = 8;
+                    ctx.fillStyle = state.bgColor;
+                    ctx.fillRect(50, 50, w - 100, h - 100);
+                    ctx.strokeStyle = '#ddd';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(50, 50, w - 100, h - 100);
+                    // 流蘇
+                    for (let i = 50; i < w - 50; i += 20) {
+                        ctx.beginPath();
+                        ctx.moveTo(i, h - 50);
+                        ctx.lineTo(i - 3, h - 30);
+                        ctx.strokeStyle = '#ccc';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                    break;
+
+                case 'tshirt':
+                    ctx.save();
+                    const tw = w * 0.72, th = h * 0.78, tx = (w - tw) / 2, ty = (h - th) / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(tx + 90, ty);
+                    ctx.lineTo(tx + tw - 90, ty);
+                    ctx.lineTo(tx + tw, ty + 70);
+                    ctx.lineTo(tx + tw, ty + th);
+                    ctx.lineTo(tx, ty + th);
+                    ctx.lineTo(tx, ty + 70);
+                    ctx.closePath();
+                    ctx.moveTo(tx, ty + 70);
+                    ctx.lineTo(tx - 55, ty + 115);
+                    ctx.lineTo(tx - 35, ty + 155);
+                    ctx.lineTo(tx, ty + 135);
+                    ctx.moveTo(tx + tw, ty + 70);
+                    ctx.lineTo(tx + tw + 55, ty + 115);
+                    ctx.lineTo(tx + tw + 35, ty + 155);
+                    ctx.lineTo(tx + tw, ty + 135);
+                    ctx.fillStyle = state.bgColor;
+                    ctx.fill();
+                    ctx.strokeStyle = '#ccc';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    // 領口
+                    ctx.beginPath();
+                    ctx.moveTo(tx + 90, ty);
+                    ctx.quadraticCurveTo(tx + tw / 2, ty + 40, tx + tw - 90, ty);
+                    ctx.strokeStyle = '#ddd';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    ctx.restore();
+                    break;
+
+                case 'cup':
+                    ctx.save();
+                    const cx = w / 2, cy = h / 2 + 10, cw = 220, ch = 280;
+                    // 杯底
+                    ctx.beginPath();
+                    ctx.ellipse(cx, cy + ch / 2 - 10, cw / 2, 28, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = state.bgColor;
+                    ctx.fill();
+                    ctx.strokeStyle = '#ccc';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    // 杯身
+                    ctx.fillRect(cx - cw / 2, cy - ch / 2 + 20, cw, ch - 30);
+                    ctx.strokeRect(cx - cw / 2, cy - ch / 2 + 20, cw, ch - 30);
+                    // 杯口
+                    ctx.beginPath();
+                    ctx.ellipse(cx, cy - ch / 2 + 20, cw / 2, 28, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = state.bgColor;
+                    ctx.fill();
+                    ctx.stroke();
+                    // 內壁
+                    ctx.beginPath();
+                    ctx.ellipse(cx, cy - ch / 2 + 20, cw / 2 - 10, 20, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(0,0,0,0.03)';
+                    ctx.fill();
+                    // 把手
+                    ctx.beginPath();
+                    ctx.arc(cx + cw / 2 + 25, cy, 45, -Math.PI / 2, Math.PI / 2);
+                    ctx.strokeStyle = '#ccc';
+                    ctx.lineWidth = 10;
+                    ctx.stroke();
+                    ctx.restore();
+                    break;
+
+                case 'sock':
+                    ctx.save();
+                    const sx = w / 2 - 90, sy = 60, sw = 180, sh = h - 120;
+                    ctx.beginPath();
+                    ctx.moveTo(sx, sy);
+                    ctx.lineTo(sx + sw, sy);
+                    ctx.lineTo(sx + sw - 15, sy + sh * 0.65);
+                    ctx.quadraticCurveTo(sx + sw - 15, sy + sh * 0.88, sx + sw - 55, sy + sh);
+                    ctx.lineTo(sx + 25, sy + sh);
+                    ctx.quadraticCurveTo(sx, sy + sh * 0.88, sx, sy + sh * 0.65);
+                    ctx.closePath();
+                    ctx.fillStyle = state.bgColor;
+                    ctx.fill();
+                    ctx.strokeStyle = '#ccc';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    // 襪口紋路
+                    for (let i = 0; i < 3; i++) {
+                        ctx.beginPath();
+                        ctx.moveTo(sx + 10, sy + 15 + i * 8);
+                        ctx.lineTo(sx + sw - 10, sy + 15 + i * 8);
+                        ctx.strokeStyle = '#ddd';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                    break;
+
+                case 'poster':
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(0,0,0,0.12)';
+                    ctx.shadowBlur = 40;
+                    ctx.shadowOffsetY = 12;
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(55, 55, w - 110, h - 110);
+                    ctx.strokeStyle = '#1a1a1a';
+                    ctx.lineWidth = 10;
+                    ctx.strokeRect(55, 55, w - 110, h - 110);
+                    ctx.fillStyle = state.bgColor;
+                    ctx.fillRect(75, 75, w - 150, h - 150);
+                    ctx.restore();
+                    break;
+
+                case 'tote':
+                    ctx.save();
+                    const bx = w / 2, by = h / 2 + 10, bw = 360, bh = 420;
+                    // 袋身
+                    ctx.fillStyle = state.bgColor;
+                    ctx.fillRect(bx - bw / 2, by - bh / 2, bw, bh);
+                    ctx.strokeStyle = '#ccc';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(bx - bw / 2, by - bh / 2, bw, bh);
+                    // 底部縫線
+                    ctx.beginPath();
+                    ctx.moveTo(bx - bw / 2 + 20, by + bh / 2 - 40);
+                    ctx.lineTo(bx + bw / 2 - 20, by + bh / 2 - 40);
+                    ctx.strokeStyle = '#ddd';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    // 提手
+                    ctx.beginPath();
+                    ctx.moveTo(bx - 80, by - bh / 2);
+                    ctx.quadraticCurveTo(bx - 80, by - bh / 2 - 80, bx - 40, by - bh / 2 - 80);
+                    ctx.lineTo(bx + 40, by - bh / 2 - 80);
+                    ctx.quadraticCurveTo(bx + 80, by - bh / 2 - 80, bx + 80, by - bh / 2);
+                    ctx.strokeStyle = '#bbb';
+                    ctx.lineWidth = 8;
+                    ctx.stroke();
+                    ctx.restore();
+                    break;
+            }
+        }
+
+        function drawText() {
+            const w = canvas.width, h = canvas.height;
+            ctx.fillStyle = state.textColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const fontFamily = fontMap[state.font] || fontMap.classic;
+            const fontSize = parseInt(state.fontSize);
+            ctx.font = '500 ' + fontSize + 'px ' + fontFamily;
+
+            const offsetX = parseInt(state.posX) * 2.5;
+            const offsetY = parseInt(state.posY) * 2.5;
+            let centerX = w / 2 + offsetX;
+            let centerY = h / 2 + offsetY;
+
+            if (state.product === 'tshirt') centerY = h * 0.46 + offsetY;
+            if (state.product === 'cup') centerY = h * 0.52 + offsetY;
+            if (state.product === 'sock') centerY = h * 0.42 + offsetY;
+            if (state.product === 'tote') centerY = h * 0.52 + offsetY;
+
+            const maxWidth = w * 0.6;
+            const lines = wrapText(state.text, maxWidth);
+            const lineHeight = fontSize * 1.65;
+            const totalHeight = lines.length * lineHeight;
+            let startY = centerY - totalHeight / 2 + lineHeight / 2;
+
+            lines.forEach((line, i) => {
+                ctx.fillText(line, centerX, startY + i * lineHeight);
+            });
+
+            if (state.source) {
+                ctx.font = '400 ' + Math.max(13, fontSize * 0.32) + 'px ' + fontFamily;
+                ctx.fillStyle = 'rgba(100,100,100,0.65)';
+                ctx.fillText(state.source, centerX, startY + lines.length * lineHeight + 28);
+            }
+
+            ctx.font = '400 10px sans-serif';
+            ctx.fillStyle = '#bbb';
+            ctx.fillText('texttextstext · 哲学的慰藉', w / 2, h - 16);
+        }
+
+        function wrapText(text, maxWidth) {
+            const lines = [];
+            let currentLine = '';
+            for (let char of text) {
+                const testLine = currentLine + char;
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = char;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+            return lines.length > 0 ? lines : [text];
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawProduct();
+            drawText();
+        }
+
+        function downloadPNG() {
+            const link = document.createElement('a');
+            link.download = 'texttextstext_' + state.product + '_' + Date.now() + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // 初始化
+        loadFromURL();
+        draw();
+    </script>
+</body>
+</html>
