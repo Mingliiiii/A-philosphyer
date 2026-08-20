@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>texttextstext · 哲學的慰藉</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: "ET Book";
+            src: url("https://cdn.jsdelivr.net/gh/edwardtufte/tufte-css@1.8.0/et-book/et-book-roman-line-figures/et-book-roman-line-figures.woff") format("woff");
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: "ET Book";
+            src: url("https://cdn.jsdelivr.net/gh/edwardtufte/tufte-css@1.8.0/et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.woff") format("woff");
+            font-weight: 400;
+            font-style: italic;
+        }
+        @font-face {
+            font-family: "ET Book";
+            src: url("https://cdn.jsdelivr.net/gh/edwardtufte/tufte-css@1.8.0/et-book/et-book-bold-line-figures/et-book-bold-line-figures.woff") format("woff");
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        :root {
+            --bg: #fffff8;
+            --text: #111;
+            --text-secondary: #555;
+            --text-tertiary: #888;
+            --border: #ddd;
+            --accent: #b51b1b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        body {
+            font-family: "ET Book", "Noto Serif TC", "Noto Serif SC", "Georgia", "Songti SC", serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 0;
+        }
+
+        /* Tufte 宽边距 */
+        .container {
+            max-width: 55rem;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        @media (min-width: 760px) {
+            .container { padding: 0 4rem; }
+        }
+
+        /* 顶部导航 */
+        nav {
+            border-bottom: 1px solid var(--border);
+            padding: 1.2rem 0;
+            margin-bottom: 4rem;
+        }
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .nav-links a:hover {
+            color: var(--text);
+            border-bottom-color: var(--text-tertiary);
+        }
+        .lang-switch {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+        }
+        .lang-switch:hover { color: var(--text); }
+
+        /* 标题区 */
+        header {
+            margin-bottom: 5rem;
+            padding-top: 2rem;
+        }
+        h1 {
+            font-size: 3.2rem;
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+        h1 em {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+        .epigraph {
+            max-width: 40rem;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            border-left: 2px solid var(--border);
+            padding-left: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        /* 主体内容 */
+        section {
+            margin-bottom: 5rem;
+        }
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+        }
+        p {
+            margin-bottom: 1.2rem;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            max-width: 45rem;
+        }
+
+        /* 模块卡片 — Tufte 风格 */
+        .modules {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin: 3rem 0 5rem;
+        }
+        @media (max-width: 700px) {
+            .modules { grid-template-columns: 1fr; gap: 2rem; }
+        }
+
+        .module {
+            border-top: 3px solid var(--text);
+            padding-top: 1.5rem;
+        }
+        .module h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+        .module p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        .module a {
+            display: inline-block;
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px solid var(--accent);
+            padding-bottom: 2px;
+            font-size: 0.95rem;
+            transition: opacity 0.2s;
+        }
+        .module a:hover {
+            opacity: 0.7;
+        }
+
+        /* 边注 */
+        .sidenote {
+            float: right;
+            clear: right;
+            margin-right: -45%;
+            width: 40%;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text-tertiary);
+            vertical-align: baseline;
+            position: relative;
+        }
+        @media (max-width: 900px) {
+            .sidenote {
+                float: none;
+                margin: 1rem 0;
+                width: 100%;
+                display: block;
+                border-left: 2px solid var(--border);
+                padding-left: 1rem;
+            }
+        }
+
+        /* 分隔线 */
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 4rem 0;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 0 4rem;
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            text-align: center;
+        }
+        footer em {
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="index.html" class="nav-brand">texttextstext</a>
+            <div class="nav-links">
+                <a href="sirius.html">Sirius</a>
+                <a href="designer.html">Designer</a>
+                <button class="lang-switch" onclick="toggleLang()">EN / 中文</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="container">
+        <h1>texttextstext</h1>
+        <p class="subtitle">哲學的慰藉 · the consolation of philosophy</p>
+        <p class="epigraph">
+            當外在的一切都被奪走時，人還能依靠什麼獲得內心的安寧？<br>
+            <em style="color:var(--text-tertiary)">— 波愛修斯《哲學的慰藉》</em>
+        </p>
+    </header>
+
+    <main class="container">
+        <section>
+            <p>
+                texttextstext 是一個關於文字、哲學與實體的實驗。我們相信，一句經過審視的話，
+                可以成為盔甲、儀式、秘密，或錨。這裡有兩個獨立的空間：
+            </p>
+
+            <div class="modules">
+                <div class="module">
+                    <h3>Sirius</h3>
+                    <p>
+                        與 AI 哲學對話引導者交談。Sirius 的原型是《哈利波特》中的小天狼星——
+                        忠誠於真實、叛逆於世俗規訓、在黑暗中依然閃耀。他會陪你找到屬於自己的那句話。
+                    </p>
+                    <a href="sirius.html">進入對話 →</a>
+                </div>
+                <div class="module">
+                    <h3>Designer</h3>
+                    <p>
+                        把文字變成可觸摸的實體。選擇字體、配色與版式，生成高清 PNG。
+                        無論是印製在方巾、陶瓷杯或帆布袋上，文字本身就是設計。
+                    </p>
+                    <a href="designer.html">開始排版 →</a>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>關於這個項目</h2>
+            <p>
+                靈感來自阿蘭·德波頓的《哲學的慰藉》。六位哲學家——蘇格拉底、伊壁鳩魯、塞內加、
+                蒙田、叔本華、尼采——分別對應六種現代人的痛苦：與世不合、缺少錢財、受挫折、
+                缺陷、傷心、困難。
+            </p>
+            <p>
+                排版風格參考 Edward Tufte 的信息設計原則：寬邊距、高信息密度、
+                襯線字體、邊注取代腳註。字體採用 ET Book 與思源宋體。
+            </p>
+            <span class="sidenote">
+                Edward Tufte 是美國統計學家與藝術家，被譽為「資訊設計之父」。
+                他的著作《The Visual Display of Quantitative Information》
+                影響了整整一代設計師與出版人。
+            </span>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <em>"The ones that love us never really leave us."</em><br>
+            texttextstext · 2026
+        </div>
+    </footer>
+
+    <script>
+        function toggleLang() {
+            alert('語言切換功能即將上線。\nLanguage switching coming soon.');
+        }
+    </script>
+</body>
+</html>

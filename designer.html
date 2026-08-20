@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designer · texttextstext</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+SC:wght@400;600&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: "ET Book";
+            src: url("https://cdn.jsdelivr.net/gh/edwardtufte/tufte-css@1.8.0/et-book/et-book-roman-line-figures/et-book-roman-line-figures.woff") format("woff");
+            font-weight: 400; font-style: normal;
+        }
+        @font-face {
+            font-family: "ET Book";
+            src: url("https://cdn.jsdelivr.net/gh/edwardtufte/tufte-css@1.8.0/et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.woff") format("woff");
+            font-weight: 400; font-style: italic;
+        }
+
+        :root {
+            --bg: #fffff8;
+            --text: #111;
+            --text-secondary: #444;
+            --text-tertiary: #777;
+            --border: #ccc;
+            --accent: #b51b1b;
+            --panel-bg: #f8f8f5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        body {
+            font-family: "ET Book", "Noto Serif TC", "Noto Serif SC", "Georgia", serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* 左侧控制面板 */
+        .panel {
+            width: 320px;
+            background: var(--panel-bg);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.8rem;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .panel-brand {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.3rem;
+        }
+        .panel-sub {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+        .back-link {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+        .back-link:hover { color: var(--text); }
+
+        .section { margin-bottom: 1.8rem; padding-bottom: 1.2rem; border-bottom: 1px solid var(--border); }
+        .section:last-child { border-bottom: none; }
+        .section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-tertiary);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: var(--bg);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        textarea:focus, input[type="text"]:focus { border-color: var(--text-secondary); }
+        textarea { min-height: 70px; resize: vertical; line-height: 1.5; }
+
+        /* 字体选择 - 精简为3种 */
+        .font-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .font-option {
+            flex: 1;
+            padding: 0.7rem 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            background: var(--bg);
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .font-option:hover { border-color: var(--text-secondary); }
+        .font-option.active {
+            border-color: var(--text);
+            background: var(--text);
+            color: var(--bg);
+        }
+        .font-option .sample {
+            font-size: 1.3rem;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .font-option .label {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        /* 配色预设 - 4个高级色板 */
+        .palette-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .palette {
+            flex: 1;
+            height: 40px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .palette:hover { transform: scale(1.05); }
+        .palette.active { border-color: var(--text); }
+        .palette::after {
+            content: attr(data-name);
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            color: var(--text-tertiary);
+            white-space: nowrap;
+        }
+
+        /* 比例选择 */
+        .ratio-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .ratio-option {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            background: var(--bg);
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .ratio-option:hover { border-color: var(--text-secondary); }
+        .ratio-option.active {
+            border-color: var(--text);
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        /* 对齐 */
+        .align-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .align-option {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            background: var(--bg);
+            cursor: pointer;
+            text-align: center;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .align-option:hover { border-color: var(--text-secondary); }
+        .align-option.active {
+            border-color: var(--text);
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        /* 字号滑块 */
+        .slider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        input[type="range"] {
+            flex: 1;
+            height: 3px;
+            border-radius: 2px;
+            background: var(--border);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--text);
+            cursor: pointer;
+        }
+        .slider-val {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+            min-width: 2rem;
+            text-align: right;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.9rem;
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            border-radius: 3px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.85; }
+
+        .hint {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 0.6rem;
+            line-height: 1.5;
+        }
+
+        /* 右侧预览 */
+        .preview-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            background: #e8e8e0;
+            position: relative;
+        }
+        #canvas {
+            background: #fff;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+            border-radius: 2px;
+        }
+        .preview-hint {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #999;
+            background: rgba(255,255,255,0.85);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        @media (max-width: 900px) {
+            .panel { width: 260px; padding: 1.5rem; }
+            .preview-area { padding: 1.5rem; }
+        }
+        @media (max-width: 700px) {
+            body { flex-direction: column; height: auto; }
+            .panel { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+            .preview-area { min-height: 500px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <div class="panel-brand">texttextstext</div>
+        <div class="panel-sub">排版設計器</div>
+        <a href="index.html" class="back-link">← 返回首頁</a>
+
+        <div class="section">
+            <div class="section-title">文本</div>
+            <label>主文字</label>
+            <textarea id="mainText" placeholder="輸入你想印刻的文字...">黑暗並不意味著沒有光，
+而是光還沒有被看見。</textarea>
+            <label style="margin-top:0.8rem">出處</label>
+            <input type="text" id="sourceText" value="— Sirius 為你寫的" placeholder="例如：— 尼采">
+        </div>
+
+        <div class="section">
+            <div class="section-title">字體</div>
+            <div class="font-options">
+                <div class="font-option active" data-font="serif" onclick="setFont('serif')">
+                    <span class="sample" style="font-family:'Noto Serif TC',serif">文</span>
+                    <span class="label">宋體</span>
+                </div>
+                <div class="font-option" data-font="sans" onclick="setFont('sans')">
+                    <span class="sample" style="font-family:'Noto Sans SC',sans-serif">文</span>
+                    <span class="label">黑體</span>
+                </div>
+                <div class="font-option" data-font="hand" onclick="setFont('hand')">
+                    <span class="sample" style="font-family:'Zhi Mang Xing',cursive">文</span>
+                    <span class="label">行書</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">配色</div>
+            <div class="palette-row">
+                <div class="palette active" data-name="墨紙" data-text="#111" data-bg="#fffff8" style="background:linear-gradient(135deg,#111 50%,#fffff8 50%);" onclick="setPalette('#111','#fffff8',this)"></div>
+                <div class="palette" data-name="素白" data-text="#333" data-bg="#fff" style="background:linear-gradient(135deg,#333 50%,#fff 50%);" onclick="setPalette('#333','#fff',this)"></div>
+                <div class="palette" data-name="松煙" data-text="#f5f5f0" data-bg="#2c3e2c" style="background:linear-gradient(135deg,#f5f5f0 50%,#2c3e2c 50%);" onclick="setPalette('#f5f5f0','#2c3e2c',this)"></div>
+                <div class="palette" data-name="赭石" data-text="#f5f5f0" data-bg="#8b4513" style="background:linear-gradient(135deg,#f5f5f0 50%,#8b4513 50%);" onclick="setPalette('#f5f5f0','#8b4513',this)"></div>
+            </div>
+            <div style="height:20px"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">比例</div>
+            <div class="ratio-options">
+                <div class="ratio-option active" data-ratio="square" onclick="setRatio('square')">1:1</div>
+                <div class="ratio-option" data-ratio="portrait" onclick="setRatio('portrait')">3:4</div>
+                <div class="ratio-option" data-ratio="landscape" onclick="setRatio('landscape')">4:3</div>
+                <div class="ratio-option" data-ratio="story" onclick="setRatio('story')">9:16</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">對齊</div>
+            <div class="align-options">
+                <div class="align-option" data-align="left" onclick="setAlign('left')">左</div>
+                <div class="align-option active" data-align="center" onclick="setAlign('center')">中</div>
+                <div class="align-option" data-align="right" onclick="setAlign('right')">右</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">字號</div>
+            <div class="slider-wrap">
+                <input type="range" id="fontSize" min="24" max="96" value="48">
+                <span class="slider-val" id="fontSizeVal">48</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <button class="btn-primary" onclick="downloadPNG()">下載 PNG</button>
+            <p class="hint">高清輸出，可用於印刷打樣</p>
+        </div>
+    </div>
+
+    <div class="preview-area">
+        <canvas id="canvas" width="600" height="600"></canvas>
+        <div class="preview-hint">實際印刷效果可能因材質略有差異</div>
+    </div>
+
+    <script>
+        // 字體映射
+        const fontMap = {
+            serif: '"Noto Serif TC", "Noto Serif SC", "ET Book", "Georgia", "Songti SC", serif',
+            sans: '"Noto Sans SC", "Noto Sans TC", "Helvetica Neue", "Arial", sans-serif',
+            hand: '"Zhi Mang Xing", "KaiTi", "STKaiti", "cursive"'
+        };
+
+        const ratioSizes = {
+            square: [600, 600],
+            portrait: [480, 640],
+            landscape: [640, 480],
+            story: [420, 720]
+        };
+
+        let state = {
+            text: document.getElementById('mainText').value,
+            source: document.getElementById('sourceText').value,
+            font: 'serif',
+            textColor: '#111',
+            bgColor: '#fffff8',
+            ratio: 'square',
+            align: 'center',
+            fontSize: 48
+        };
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // 從 URL 讀取參數
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const text = params.get('text');
+            const source = params.get('source');
+            if (text) {
+                document.getElementById('mainText').value = text;
+                state.text = text;
+            }
+            if (source) {
+                document.getElementById('sourceText').value = '— ' + source;
+                state.source = '— ' + source;
+            }
+        }
+
+        // 監聽文本變化
+        document.getElementById('mainText').addEventListener('input', (e) => { state.text = e.target.value; draw(); });
+        document.getElementById('sourceText').addEventListener('input', (e) => { state.source = e.target.value; draw(); });
+        document.getElementById('fontSize').addEventListener('input', (e) => {
+            state.fontSize = parseInt(e.target.value);
+            document.getElementById('fontSizeVal').textContent = e.target.value;
+            draw();
+        });
+
+        function setFont(font) {
+            state.font = font;
+            document.querySelectorAll('.font-option').forEach(el => el.classList.toggle('active', el.dataset.font === font));
+            draw();
+        }
+
+        function setPalette(textColor, bgColor, el) {
+            state.textColor = textColor;
+            state.bgColor = bgColor;
+            document.querySelectorAll('.palette').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            draw();
+        }
+
+        function setRatio(ratio) {
+            state.ratio = ratio;
+            document.querySelectorAll('.ratio-option').forEach(el => el.classList.toggle('active', el.dataset.ratio === ratio));
+            const [w, h] = ratioSizes[ratio];
+            canvas.width = w;
+            canvas.height = h;
+            draw();
+        }
+
+        function setAlign(align) {
+            state.align = align;
+            document.querySelectorAll('.align-option').forEach(el => el.classList.toggle('active', el.dataset.align === align));
+            draw();
+        }
+
+        // 高清 Canvas 渲染
+        function setupHiDPICanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+        }
+
+        function draw() {
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            const dpr = window.devicePixelRatio || 1;
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, w, h);
+
+            // 背景
+            ctx.fillStyle = state.bgColor;
+            ctx.fillRect(0, 0, w, h);
+
+            // 細邊框裝飾（Tufte 風格）
+            ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+            ctx.lineWidth = 1;
+            const margin = Math.min(w, h) * 0.08;
+            ctx.strokeRect(margin, margin, w - margin * 2, h - margin * 2);
+
+            // 字體設置
+            const fontFamily = fontMap[state.font];
+            const fontSize = state.fontSize;
+            ctx.font = '600 ' + fontSize + 'px ' + fontFamily;
+            ctx.fillStyle = state.textColor;
+
+            // 對齊
+            const alignMap = { left: 'left', center: 'center', right: 'right' };
+            ctx.textAlign = alignMap[state.align] || 'center';
+            ctx.textBaseline = 'middle';
+
+            // 計算文本區域
+            const textX = state.align === 'left' ? margin * 1.5 : (state.align === 'right' ? w - margin * 1.5 : w / 2);
+            const maxWidth = w - margin * 3;
+
+            // 分行
+            const lines = wrapText(state.text, maxWidth);
+            const lineHeight = fontSize * 1.55;
+            const totalHeight = lines.length * lineHeight;
+            const centerY = h / 2;
+            let startY = centerY - totalHeight / 2 + lineHeight / 2;
+
+            // 繪製主文字
+            lines.forEach((line, i) => {
+                ctx.fillText(line, textX, startY + i * lineHeight);
+            });
+
+            // 出處
+            if (state.source) {
+                ctx.font = '400 ' + Math.max(12, fontSize * 0.3) + 'px ' + fontFamily;
+                ctx.fillStyle = hexToRgba(state.textColor, 0.55);
+                const sourceY = startY + lines.length * lineHeight + fontSize * 0.6;
+                ctx.fillText(state.source, textX, sourceY);
+            }
+
+            // 品牌標識
+            ctx.font = '400 9px "Helvetica Neue", sans-serif';
+            ctx.fillStyle = hexToRgba(state.textColor, 0.2);
+            ctx.textAlign = 'center';
+            ctx.fillText('texttextstext', w / 2, h - margin * 0.6);
+        }
+
+        function wrapText(text, maxWidth) {
+            const lines = [];
+            let currentLine = '';
+            for (let char of text) {
+                if (char === '\n') {
+                    lines.push(currentLine);
+                    currentLine = '';
+                    continue;
+                }
+                const testLine = currentLine + char;
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = char;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+            return lines.length > 0 ? lines : [text];
+        }
+
+        function hexToRgba(hex, alpha) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+        }
+
+        function downloadPNG() {
+            const link = document.createElement('a');
+            link.download = 'texttextstext_' + state.ratio + '_' + Date.now() + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // 初始化
+        loadFromURL();
+        setupHiDPICanvas();
+        draw();
+
+        // 窗口大小變化時重新設置 canvas
+        window.addEventListener('resize', () => {
+            setupHiDPICanvas();
+            draw();
+        });
+    </script>
+</body>
+</html>
