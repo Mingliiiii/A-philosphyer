@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>texttextstext</title>
+    <style>
+        @font-face {
+            font-family: "ET Book";
+            src: url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@master/et-book/et-book-roman-line-figures/et-book-roman-line-figures.woff") format("woff");
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: "ET Book";
+            src: url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@master/et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.woff") format("woff");
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "ET Book", Georgia, "Times New Roman", serif;
+            background: #0a0a0a;
+            color: #e8e8e8;
+            font-size: 17px;
+            line-height: 1.2;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 48px 24px 40px;
+        }
+
+        .container {
+            max-width: 560px;
+            width: 100%;
+        }
+
+        .title {
+            font-size: 64px;
+            font-weight: normal;
+            letter-spacing: 1px;
+            color: #f0f0f0;
+            margin-bottom: 2px;
+            line-height: 1.05;
+        }
+
+        .subtitle {
+            font-size: 34px;
+            color: #f0f0f0;
+            font-style: italic;
+            margin-bottom: 32px;
+            line-height: 1.15;
+        }
+
+        .word-section {
+            margin-bottom: 48px;
+            font-size: 24px;
+            line-height: 1.15;
+            color: #f0f0f0;
+        }
+        .word-term {
+            font-size: 34px;
+            color: #f0f0f0;
+            font-weight: normal;
+            font-style: italic;
+            margin-bottom: 8px;
+            line-height: 1.1;
+        }
+        .word-text {
+            margin-bottom: 12px;
+        }
+        .word-ref {
+            font-size: 13px;
+            color: #888;
+            line-height: 1.3;
+            text-align: left;
+        }
+
+        /* Scale center */
+        .scale-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 48px 0 28px;
+        }
+
+        .scale-assembly {
+            position: relative;
+            width: 308px;
+            height: 252px;
+            animation: scaleSwing 4s ease-in-out infinite;
+            transform-origin: 50% 20%;
+        }
+        @keyframes scaleSwing {
+            0%, 100% { transform: rotate(-6deg); }
+            50% { transform: rotate(6deg); }
+        }
+
+        .scale-grid {
+            display: grid;
+            grid-template-columns: repeat(22, 14px);
+            grid-template-rows: repeat(18, 14px);
+            gap: 0;
+        }
+        .scale-cell {
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-family: "ET Book", serif;
+            color: transparent;
+            user-select: none;
+            transition: color 0.1s;
+            border: none;
+            background: transparent;
+        }
+        .scale-cell.on {
+            color: #f0f0f0;
+            border: 1px solid #f0f0f0;
+            animation: cellShake 4s ease-in-out infinite;
+        }
+        @keyframes cellShake {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            20% { transform: translate(-0.5px, 0.5px) rotate(-0.5deg); }
+            40% { transform: translate(0.5px, -0.5px) rotate(0.5deg); }
+            60% { transform: translate(-0.3px, 0.3px) rotate(-0.3deg); }
+            80% { transform: translate(0.3px, -0.3px) rotate(0.3deg); }
+        }
+
+        /* Path cards */
+        .paths {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+            margin-top: 16px;
+        }
+        .path-card {
+            text-decoration: none;
+            color: inherit;
+            padding: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .path-card:hover .letter-cell {
+            border-color: #444;
+        }
+        .letter-grid {
+            display: grid;
+            gap: 1px;
+        }
+        .letter-cell {
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-family: "ET Book", serif;
+            color: #f0f0f0;
+            border: 0.5px solid #2a2a2a;
+            user-select: none;
+            transition: color 0.1s, border-color 0.2s;
+        }
+        .letter-cell.glitch {
+            color: #666;
+        }
+
+        .colophon {
+            margin-bottom: 28px;
+            margin-top: 28px;
+        }
+        .colophon h3 {
+            font-size: 34px;
+            color: #f0f0f0;
+            font-weight: normal;
+            font-style: italic;
+            margin-bottom: 8px;
+            line-height: 1.1;
+        }
+        .colophon-text {
+            font-size: 24px;
+            color: #f0f0f0;
+            line-height: 1.15;
+        }
+        .colophon-text a {
+            color: #f0f0f0;
+            text-decoration: underline;
+            text-decoration-color: #444;
+            text-underline-offset: 2px;
+            transition: text-decoration-color 0.2s;
+        }
+        .colophon-text a:hover {
+            text-decoration-color: #888;
+        }
+
+        .footer {
+            font-size: 13px;
+            color: #f0f0f0;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 36px 20px 32px; }
+            .title { font-size: 48px; }
+            .subtitle { font-size: 28px; }
+            .word-section { font-size: 20px; }
+            .word-term { font-size: 28px; }
+            .colophon h3 { font-size: 28px; }
+            .colophon-text { font-size: 20px; }
+            .scale-assembly { width: 220px; height: 180px; }
+            .scale-grid { grid-template-columns: repeat(22, 10px); grid-template-rows: repeat(18, 10px); }
+            .scale-cell { width: 10px; height: 10px; font-size: 6px; }
+            .letter-cell { width: 10px; height: 10px; font-size: 6px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">texttextstext</div>
+        <div class="subtitle">the consolation of philosophy</div>
+
+        <div class="word-section" id="wordSection"></div>
+
+        <div class="scale-center">
+            <div class="scale-assembly">
+                <div class="scale-grid" id="scaleGrid"></div>
+            </div>
+
+            <div class="paths">
+                <a href="sirius.html" class="path-card" id="philCard">
+                    <div class="letter-grid" id="philGrid"></div>
+                </a>
+                <a href="designer.html" class="path-card" id="designCard">
+                    <div class="letter-grid" id="designGrid"></div>
+                </a>
+            </div>
+        </div>
+
+        <div class="colophon">
+            <h3>Colophon</h3>
+            <p class="colophon-text">
+                Inspired by Alain de Botton's <em>The Consolation of Philosophy</em>. Typography follows Edward Tufte's principles. Typeface: <a href="https://github.com/edwardtufte/et-book" target="_blank">ET Book</a> & <a href="https://github.com/adobe-fonts/source-han-serif" target="_blank">Source Han Serif</a>. Open source on <a href="#" target="_blank">GitHub</a>.
+            </p>
+        </div>
+
+        <div class="footer">texttextstext 2026</div>
+    </div>
+
+    <script>
+        const words = [
+            {
+                term: "Fallacy",
+                text: "A mistaken belief, especially one based on unsound argument. Not a lie — a trap in reasoning. For instance, 'everyone does it, so it must be fine' is the appeal to popularity fallacy.",
+                ref: "Cicero, M. T. (55 BCE). De Oratore (Book II)."
+            },
+            {
+                term: "Akrasia",
+                text: "Acting against your better judgment. Knowing what you should do, yet doing the opposite. Aristotle called it 'weakness of will.' You know the cake will make you sick. You eat it anyway.",
+                ref: "Aristotle. (c. 350 BCE). Nicomachean Ethics (Book VII). Cambridge, MA: Harvard University Press."
+            },
+            {
+                term: "Aporia",
+                text: "A state of puzzlement. The moment you realize your own question has no easy answer. Socrates used this as a weapon. He would walk through Athens until someone felt the ground shift beneath their certainty.",
+                ref: "Plato. (c. 360 BCE). Theaetetus. In J. M. Cooper (Ed.), Plato: Complete Works. Indianapolis, IN: Hackett Publishing."
+            },
+            {
+                term: "Sublime",
+                text: "An experience so vast it overwhelms reason. Not beauty — something that dwarfs you. Kant said it was the starry sky above and the moral law within. Longinus found it in a single thunderbolt of language.",
+                ref: "Kant, I. (1790). Critique of Judgment (§23–§29). Trans. J. C. Meredith. Oxford: Clarendon Press."
+            },
+            {
+                term: "Episteme",
+                text: "Knowledge that is certain and teachable. Not opinion. Not belief. Solid ground. Plato distinguished this from doxa, mere opinion. A carpenter knows how to build a table. That is episteme.",
+                ref: "Plato. (c. 375 BCE). Republic (Books V–VI). Trans. G. M. A. Grube. Indianapolis, IN: Hackett Publishing."
+            },
+            {
+                term: "Dasein",
+                text: "Heidegger's word for 'being-there.' Not just existing, but existing in a way that questions itself. A hammer does not ask what it means to be a hammer. You do. That questioning is what makes you Dasein.",
+                ref: "Heidegger, M. (1927). Being and Time (§9–§12). Trans. J. Macquarrie & E. Robinson. New York, NY: Harper & Row."
+            },
+            {
+                term: "Stoicism",
+                text: "Not the suppression of emotion, but the discipline of judgment. Separating what you control from what you do not. Epictetus was born a slave. He wrote: 'It is not things that disturb us, but our judgment about things.'",
+                ref: "Epictetus. (c. 135 CE). Enchiridion. Trans. G. Long. Mineola, NY: Dover Publications."
+            },
+            {
+                term: "Phenomenon",
+                text: "From Greek phainesthai, 'to appear.' Not the thing itself, but the thing as it shows itself to consciousness. Husserl's method: bracket all assumptions. Look at the cup not as ceramic, but as the shape your hand expects.",
+                ref: "Husserl, E. (1913). Ideas Pertaining to a Pure Phenomenology and to a Phenomenological Philosophy (§§27–32). Trans. F. Kersten. The Hague: Martinus Nijhoff."
+            },
+            {
+                term: "Irony",
+                text: "Saying one thing and meaning another. But also: a mode of existence where you remain detached from your own role. Kierkegaard wrote that Socrates was pure irony. He played the fool to make Athens see it was the real fool.",
+                ref: "Kierkegaard, S. (1841). The Concept of Irony with Continual Reference to Socrates. Trans. H. V. Hong & E. H. Hong. Princeton, NJ: Princeton University Press."
+            },
+            {
+                term: "Anamnesis",
+                text: "Plato's theory of recollection. Learning is not acquiring new facts, but remembering what the soul already knows. In Meno, Socrates draws a square in the sand. A slave boy 'recalls' geometry he was never taught.",
+                ref: "Plato. (c. 380 BCE). Meno. In J. M. Cooper (Ed.), Plato: Complete Works (pp. 870–897). Indianapolis, IN: Hackett Publishing."
+            }
+        ];
+
+        function randomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        const w = randomItem(words);
+        document.getElementById('wordSection').innerHTML =
+            '<div class="word-term">' + w.term + '</div>' +
+            '<div class="word-text">' + w.text + '</div>' +
+            '<div class="word-ref">' + w.ref + '</div>';
+
+        // Scale pixel matrix (22 cols x 18 rows)
+        const scaleMatrix = [
+            [0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+            [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+            [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+            [0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],
+            [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+            [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+            [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+            [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
+            [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+            [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
+            [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+            [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        ];
+
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        const grid = document.getElementById('scaleGrid');
+        const scaleCells = [];
+
+        scaleMatrix.forEach((row, y) => {
+            row.forEach((cell, x) => {
+                const div = document.createElement('div');
+                const isOn = cell === 1;
+                div.className = 'scale-cell' + (isOn ? ' on' : '');
+                if (isOn) {
+                    const char = letters[Math.floor(Math.random() * letters.length)];
+                    div.textContent = char;
+                    const distFromCenter = Math.abs(x - 11) + Math.abs(y - 6);
+                    div.style.animationDelay = (distFromCenter * 0.04) + 's';
+                }
+                grid.appendChild(div);
+                scaleCells.push({ el: div, on: isOn, x, y });
+            });
+        });
+
+        // Scale flicker: border + letter appear/disappear together
+        const hiddenCells = new Set();
+
+        setInterval(() => {
+            const onCells = scaleCells.filter(c => c.on);
+
+            // Hide 1-6 cells (border + letter both disappear)
+            const hideCount = Math.floor(Math.random() * 6) + 1;
+            for (let i = 0; i < hideCount; i++) {
+                const idx = Math.floor(Math.random() * onCells.length);
+                const cell = onCells[idx];
+                if (!hiddenCells.has(cell.el)) {
+                    cell.el.style.border = 'none';
+                    cell.el.textContent = '';
+                    hiddenCells.add(cell.el);
+                }
+            }
+
+            // Restore 1-4 cells (border + new letter both appear)
+            const restoreCount = Math.floor(Math.random() * 4) + 1;
+            const hiddenArray = Array.from(hiddenCells);
+            for (let i = 0; i < restoreCount && hiddenArray.length > 0; i++) {
+                const idx = Math.floor(Math.random() * hiddenArray.length);
+                const el = hiddenArray[idx];
+                el.style.border = '';
+                el.textContent = letters[Math.floor(Math.random() * letters.length)];
+                hiddenCells.delete(el);
+                hiddenArray.splice(idx, 1);
+            }
+
+            // Randomly change letters in visible cells
+            const visibleCells = onCells.filter(c => !hiddenCells.has(c.el));
+            const letterCount = Math.floor(Math.random() * 8) + 2;
+            for (let i = 0; i < letterCount && visibleCells.length > 0; i++) {
+                const idx = Math.floor(Math.random() * visibleCells.length);
+                const cell = visibleCells[idx];
+                cell.el.textContent = letters[Math.floor(Math.random() * letters.length)];
+            }
+        }, 800);
+
+        // Letter grid cards
+        function createLetterGrid(containerId, word, href) {
+            const container = document.getElementById(containerId);
+            const chars = word.split('');
+            const cols = word.length;
+            container.style.gridTemplateColumns = 'repeat(' + cols + ', 14px)';
+            const cells = [];
+
+            chars.forEach((char, i) => {
+                const div = document.createElement('div');
+                div.className = 'letter-cell';
+                div.textContent = char;
+                container.appendChild(div);
+                cells.push({ el: div, correct: char });
+            });
+
+            let glitchInterval = setInterval(() => {
+                const count = Math.floor(Math.random() * 3) + 1;
+                for (let i = 0; i < count; i++) {
+                    const idx = Math.floor(Math.random() * cells.length);
+                    const cell = cells[idx];
+                    if (cell.el.textContent !== cell.correct) {
+                        cell.el.textContent = cell.correct;
+                        cell.el.classList.remove('glitch');
+                    } else {
+                        cell.el.textContent = letters[Math.floor(Math.random() * letters.length)];
+                        cell.el.classList.add('glitch');
+                    }
+                }
+            }, 900);
+
+            const card = container.closest('.path-card');
+            card.addEventListener('mouseenter', () => {
+                clearInterval(glitchInterval);
+                cells.forEach(c => {
+                    c.el.textContent = c.correct;
+                    c.el.classList.remove('glitch');
+                });
+            });
+            card.addEventListener('mouseleave', () => {
+                glitchInterval = setInterval(() => {
+                    const count = Math.floor(Math.random() * 3) + 1;
+                    for (let i = 0; i < count; i++) {
+                        const idx = Math.floor(Math.random() * cells.length);
+                        const cell = cells[idx];
+                        if (cell.el.textContent === cell.correct) {
+                            cell.el.textContent = letters[Math.floor(Math.random() * letters.length)];
+                            cell.el.classList.add('glitch');
+                        }
+                    }
+                }, 900);
+            });
+        }
+
+        createLetterGrid('philGrid', 'A Philosopher', 'sirius.html');
+        createLetterGrid('designGrid', 'A Designer', 'designer.html');
+    </script>
+</body>
+</html>
